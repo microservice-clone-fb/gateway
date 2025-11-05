@@ -1,0 +1,57 @@
+server:
+  port: 5000
+
+app:
+  api-prefix: /v1
+  allowed-origins: http://localhost:5173
+  identity-service:
+    url: http://localhost:5001/identity
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: identity_service
+          uri: http://localhost:5001
+          predicates:
+            - Path=${app.api-prefix}/identity/**
+          filters:
+            - StripPrefix=1
+        - id: profile_service
+          uri: http://localhost:5002
+          predicates:
+            - Path=${app.api-prefix}/profile/users/**
+          filters:
+            - StripPrefix=1
+        - id: notification_service
+          uri: http://localhost:5003
+          predicates:
+            - Path=${app.api-prefix}/notification/**
+          filters:
+            - StripPrefix=1
+        - id: post_service
+          uri: http://localhost:5004
+          predicates:
+            - Path=${app.api-prefix}/post/**
+          filters:
+            - StripPrefix=1
+        - id: file_service
+          uri: http://localhost:5005
+          predicates:
+            - Path=${app.api-prefix}/file/**
+          filters:
+            - StripPrefix=1
+        - id: chat_service
+          uri: http://localhost:5006
+          predicates:
+            - Path=${app.api-prefix}/chat/**
+          filters:
+            - StripPrefix=1
+        - id: relationship_service
+          uri: http://localhost:5007
+          predicates:
+            - Path=${app.api-prefix}/relationship/**
+          filters:
+            - StripPrefix=1
