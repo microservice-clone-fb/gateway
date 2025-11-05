@@ -2,10 +2,10 @@ server:
   port: ${PORT:5000}
 
 app:
-  api-prefix: /v1
-  allowed-origins: http://localhost:5173
+  api-prefix: ${APP_API_PREFIX:/v1}
+  allowed-origins: ${APP_ALLOWED_ORIGINS:http://localhost:5173}
   identity-service:
-    url: http://localhost:5001/identity
+    url: ${IDENTITY_SERVICE_URL:http://localhost:5001}/identity
 
 spring:
   application:
@@ -14,43 +14,43 @@ spring:
     gateway:
       routes:
         - id: identity_service
-          uri: http://localhost:5001
+          uri: ${IDENTITY_SERVICE_URL:http://localhost:5001}
           predicates:
             - Path=${app.api-prefix}/identity/**
           filters:
             - StripPrefix=1
         - id: profile_service
-          uri: http://localhost:5002
+          uri: ${PROFILE_SERVICE_URL:http://localhost:5002}
           predicates:
             - Path=${app.api-prefix}/profile/users/**
           filters:
             - StripPrefix=1
         - id: notification_service
-          uri: http://localhost:5003
+          uri: ${NOTIFICATION_SERVICE_URL:http://localhost:5003}
           predicates:
             - Path=${app.api-prefix}/notification/**
           filters:
             - StripPrefix=1
         - id: post_service
-          uri: http://localhost:5004
+          uri: ${POST_SERVICE_URL:http://localhost:5004}
           predicates:
             - Path=${app.api-prefix}/post/**
           filters:
             - StripPrefix=1
         - id: file_service
-          uri: http://localhost:5005
+          uri: ${FILE_SERVICE_URL:http://localhost:5005}
           predicates:
             - Path=${app.api-prefix}/file/**
           filters:
             - StripPrefix=1
         - id: chat_service
-          uri: http://localhost:5006
+          uri: ${CHAT_SERVICE_URL:http://localhost:5006}
           predicates:
             - Path=${app.api-prefix}/chat/**
           filters:
             - StripPrefix=1
         - id: relationship_service
-          uri: http://localhost:5007
+          uri: ${RELATIONSHIP_SERVICE_URL:http://localhost:5007}
           predicates:
             - Path=${app.api-prefix}/relationship/**
           filters:
