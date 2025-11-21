@@ -28,10 +28,26 @@ public class SocketIOConfig {
         config.setPort(port);
         config.setAllowCustomRequests(true);
         config.setOrigin("*"); // Allow all origins in development (configure properly in production)
+        
+        // Thêm config cho React Native client
+        config.setPingTimeout(60000); // 60 seconds
+        config.setPingInterval(25000); // 25 seconds
+        config.setUpgradeTimeout(10000); // 10 seconds
+        config.setMaxHttpContentLength(1048576); // 1MB
+        
+        // Enable both websocket and polling transports
+        config.setTransports(com.corundumstudio.socketio.Transport.WEBSOCKET, com.corundumstudio.socketio.Transport.POLLING);
+        
+        // Additional config for better compatibility
+        config.setRandomSession(true); // Generate random session IDs
+        // Không set AuthorizationListener - cho phép tất cả connections
+        // Authentication sẽ được handle trong ConnectListener
 
         SocketIOServer server = new SocketIOServer(config);
         log.info("🔌 Socket.IO server will start on {}:{} (separate port from HTTP server)", host, port);
         log.info("⚠️ Note: netty-socketio runs as standalone server, cannot share port with Spring Cloud Gateway");
+        log.info("📝 Socket.IO config: pingTimeout={}ms, pingInterval={}ms, upgradeTimeout={}ms", 
+                config.getPingTimeout(), config.getPingInterval(), config.getUpgradeTimeout());
         return server;
     }
 }
