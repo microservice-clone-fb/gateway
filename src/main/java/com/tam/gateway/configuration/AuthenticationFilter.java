@@ -56,7 +56,13 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         ServerHttpRequest request = exchange.getRequest();
         ServerHttpResponse response = exchange.getResponse();
 
-        log.info("AuthenticationFilter: checking request {}", request.getURI());
+        log.info("AuthenticationFilter: checking request {} - Method: {}", request.getURI(), request.getMethod());
+
+        // ✅ Bỏ qua OPTIONS request (CORS preflight) - để CORS filter xử lý
+        if (request.getMethod() == org.springframework.http.HttpMethod.OPTIONS) {
+            log.info("OPTIONS request (CORS preflight) - bypassing authentication");
+            return chain.filter(exchange);
+        }
 
         // ✅ Nếu là public endpoint → bỏ qua kiểm tra token
         if (isPublicEndpoint(request)) {

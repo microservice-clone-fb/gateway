@@ -19,7 +19,7 @@ public class WebClientConfiguration {
     String urlIdentity;
 
     @Value("${app.allowed-origins}")
-    private String allowedOrigin;
+    private String allowedOrigins;
     @Bean
     WebClient webClient(){
         return WebClient.builder()
@@ -30,14 +30,20 @@ public class WebClientConfiguration {
     @Bean
     CorsWebFilter corsWebFilter() {
         CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.setAllowedOrigins(List.of(allowedOrigin));
-        corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // Parse multiple origins từ config (format: "origin1,origin2,origin3")
+        List<String> originsList = List.of(allowedOrigins.split(","));
+        corsConfig.setAllowedOrigins(originsList);
+        corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         corsConfig.setAllowedHeaders(List.of("*"));
         corsConfig.setAllowCredentials(true);
+        corsConfig.setMaxAge(3600L); // Cache preflight for 1 hour
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfig);
-        return new CorsWebFilter(source);
+        
+        // Tạo filter với order thấp hơn AuthenticationFilter để chạy trước
+        CorsWebFilter filter = new CorsWebFilter(source);
+        return filter;
     }
 
 
