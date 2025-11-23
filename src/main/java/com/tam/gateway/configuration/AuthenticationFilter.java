@@ -56,7 +56,9 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         ServerHttpRequest request = exchange.getRequest();
         ServerHttpResponse response = exchange.getResponse();
 
-        log.info("AuthenticationFilter: checking request {} - Method: {}", request.getURI(), request.getMethod());
+        log.info("🔍 [Gateway] Request received - URI: {}, Method: {}, Remote: {}", 
+                request.getURI(), request.getMethod(), request.getRemoteAddress());
+        log.info("🔍 [Gateway] Headers: {}", request.getHeaders());
 
         // ✅ Bỏ qua OPTIONS request (CORS preflight) - để CORS filter xử lý
         if (request.getMethod() == org.springframework.http.HttpMethod.OPTIONS) {

@@ -56,6 +56,8 @@ public class SocketIOService implements ApplicationListener<ApplicationReadyEven
             socketIOServer.start();
             started = true;
             log.info("✅ Socket.IO server started successfully in Gateway");
+            log.info("📝 Socket.IO server listening on 0.0.0.0:9092 - ready to accept connections");
+            log.info("📝 Waiting for client connections...");
         } catch (Exception e) {
             log.error("❌ Failed to start Socket.IO server in Gateway", e);
         }
@@ -70,20 +72,36 @@ public class SocketIOService implements ApplicationListener<ApplicationReadyEven
 
     private ConnectListener onConnected() {
         return socket -> {
-            String userId = socket.getHandshakeData().getSingleUrlParam("userId");
-            log.info("✅ Socket client connected - Session ID: {}, User ID: {}", socket.getSessionId(), userId);
+            try {
+                String userId = socket.getHandshakeData().getSingleUrlParam("userId");
+                String token = socket.getHandshakeData().getSingleUrlParam("token");
+                String remoteAddress = socket.getRemoteAddress().toString();
+                
+                log.info("✅ Socket client connected - Session ID: {}, User ID: {}, Remote: {}", 
+                        socket.getSessionId(), userId, remoteAddress);
+                log.debug("📝 Connection details - Token present: {}, Headers: {}", 
+                        token != null, socket.getHandshakeData().getHttpHeaders());
 
-            // Store user session if needed
-            socket.set("userId", userId);
+                // Store user session if needed
+                socket.set("userId", userId);
+            } catch (Exception e) {
+                log.error("❌ Error in onConnected handler", e);
+            }
         };
     }
 
     private DisconnectListener onDisconnected() {
         return socket -> {
-            String userId = (String) socket.get("userId");
-            log.info("❌ Socket client disconnected - Session ID: {}, User ID: {}", socket.getSessionId(), userId);
+            try {
+                String userId = (String) socket.get("userId");
+                log.info("❌ Socket client disconnected - Session ID: {}, User ID: {}", 
+                        socket.getSessionId(), userId);
+            } catch (Exception e) {
+                log.error("❌ Error in onDisconnected handler", e);
+            }
         };
     }
+
 
     /**
      * Emit event to specific user by userId
